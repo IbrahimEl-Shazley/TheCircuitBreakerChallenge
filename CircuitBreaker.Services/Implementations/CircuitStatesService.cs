@@ -24,7 +24,8 @@ namespace CircuitBreaker.Services.Implementations
 
             _stateMachine.Configure(CircuitBreakerState.Closed)
                 .OnEntry(() => EnteredClosed())
-                .Permit(CircuitBreakerTrigger.Failure, CircuitBreakerState.Open);
+                .Permit(CircuitBreakerTrigger.Failure, CircuitBreakerState.Open)
+                .Permit(CircuitBreakerTrigger.Reset, CircuitBreakerState.HalfOpen);
 
             _stateMachine.Configure(CircuitBreakerState.Open)
                 .OnEntry(() => OpenedEntered())
@@ -33,7 +34,9 @@ namespace CircuitBreaker.Services.Implementations
             _stateMachine.Configure(CircuitBreakerState.HalfOpen)
                 .OnEntry(() => HalfOpenedEntered())
                 .Permit(CircuitBreakerTrigger.Success, CircuitBreakerState.Closed)
-                .Permit(CircuitBreakerTrigger.Failure, CircuitBreakerState.Open);
+                .Permit(CircuitBreakerTrigger.Failure, CircuitBreakerState.Open)
+                .Permit(CircuitBreakerTrigger.Reset, CircuitBreakerState.Closed);
+
 
         }
         public CircuitBreakerState CurrentState => initalState;
@@ -42,7 +45,7 @@ namespace CircuitBreaker.Services.Implementations
         public void Execute(Action action)
         {
             ResetAfterTime(TimeSpan.FromMinutes(1));
-            if (_stateMachine.State == CircuitBreakerState.Open)
+            if (CurrentState == CircuitBreakerState.Open)
             {
                 // Circuit is open, don't execute the action
                 throw new CircuitOpenException();
@@ -52,21 +55,22 @@ namespace CircuitBreaker.Services.Implementations
             {
                 //await Task.Run(() => { action(); }) ;
                 action();
-                if (_stateMachine.State == CircuitBreakerState.HalfOpen)
+                if (CurrentState == CircuitBreakerState.HalfOpen)
                 {
                     _stateMachine.Fire(CircuitBreakerTrigger.Success);
+                    initalState = CircuitBreakerState.Closed;
                 }
             }
             catch (Exception ex)
             {
-                if (_stateMachine.State == CircuitBreakerState.Open == false && consecutiveFailures < failureThreshold)
+                if (CurrentState == CircuitBreakerState.Open == false && consecutiveFailures < failureThreshold)
                 {
                     consecutiveFailures++;
                 }
                 //if the count of max attempt if reached, then open the circuits 
                 if (consecutiveFailures == failureThreshold)
                 {
-                    if (_stateMachine.State == CircuitBreakerState.Open == false)
+                    if (CurrentState == CircuitBreakerState.Open == false)
                     {
                         _stateMachine.Fire(CircuitBreakerTrigger.Failure);
                     }
@@ -79,7 +83,7 @@ namespace CircuitBreaker.Services.Implementations
 
         public void ResetAfterTime(TimeSpan delay)
         {
-            if (_stateMachine.State == CircuitBreakerState.Open && openTime.HasValue && DateTime.Now - openTime.Value >= delay)
+            if (CurrentState == CircuitBreakerState.Open && openTime.HasValue && DateTime.Now - openTime.Value >= delay)
             {
                 _stateMachine.Fire(CircuitBreakerTrigger.Reset);
             }
@@ -94,9 +98,10 @@ namespace CircuitBreaker.Services.Implementations
 
         private void Reset()
         {
-            if (_stateMachine.State == CircuitBreakerState.Open)
+            if (CurrentState == CircuitBreakerState.Open)
             {
                 _stateMachine.Fire(CircuitBreakerTrigger.Reset);
+                initalState = CircuitBreakerState.HalfOpen;
             }
         }
 
@@ -109,7 +114,6 @@ namespace CircuitBreaker.Services.Implementations
         private void EnteredClosed()
         {
             initalState = CircuitBreakerState.Closed;
-
             consecutiveFailures = 0; // Reset consecutive failures when entering Closed state
         }
 

@@ -50,11 +50,11 @@ namespace CircuitBreakerChallenge.Middlewares
                     await ProcessPendingRequests();
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 // An exception occurred, mark the circuit breaker as tripped
                 _circuitStateService.Fail();
-                throw;
+                return;
             }
         }
 

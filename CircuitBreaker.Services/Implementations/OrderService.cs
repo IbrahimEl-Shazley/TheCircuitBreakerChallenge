@@ -31,7 +31,9 @@ namespace CircuitBreaker.Services.Implementations
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri("https://dummy.restapiexample.com/api/v1/employee/1")
+                //RequestUri = new Uri("https://dummy.restapiexample.com/api/v1/employee/1")
+                RequestUri = new Uri("https://reqres.in/api/users/2")
+
             };
             HttpClient httpClient = new HttpClient();
             var response = httpClient.Send(request);
