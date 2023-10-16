@@ -22,7 +22,6 @@ namespace CircuitBreakerChallenge.Controllers
         {
             try
             {
-              
                 // Perform your protected operation here
                 // For example, make an HTTP request to an external service
                 var result = _Order.ExecuteOperation();

@@ -8,7 +8,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CircuitBreaker.Core.Filters
+namespace CircuitBreakerChallenge.Filters
 {
     public class ThrottleAttribute : ActionFilterAttribute
     {

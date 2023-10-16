@@ -20,26 +20,12 @@ namespace CircuitBreaker.Services.Implementations
         {
             var circuitBreaker = new CircuitStatesService();
 
-            try
+            bool data = false;
+            circuitBreaker.Execute(() =>
             {
-                bool data=false ;
-                circuitBreaker.Execute(() =>
-                {
-                    data = ForgetPassword();
-                });
-                return data;
-            }
-            catch (CircuitOpenException ex)
-            {
-                // Handle the circuit being open
-                //return ex.Message;
-                throw new CircuitOpenException();
-
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
+                data = ForgetPassword();
+            });
+            return data;
         }
 
     }

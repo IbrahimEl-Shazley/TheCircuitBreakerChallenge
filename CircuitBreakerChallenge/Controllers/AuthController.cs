@@ -1,5 +1,5 @@
-﻿using CircuitBreaker.Core.Filters;
-using CircuitBreaker.Services.Interfaces;
+﻿using CircuitBreaker.Services.Interfaces;
+using CircuitBreakerChallenge.Filters;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Xml.Linq;

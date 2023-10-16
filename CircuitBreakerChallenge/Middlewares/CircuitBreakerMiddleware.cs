@@ -44,7 +44,7 @@ namespace CircuitBreakerChallenge.Middlewares
                 await _next(context);
 
                 // Check if the circuit breaker is in the half-open state
-                if (_circuitStateService.CurrentState == CircuitBreakerState.HalfOpen)
+                if (_circuitStateService.CurrentState != CircuitBreakerState.Open)
                 {
                     // Process any pending requests in the queue
                     await ProcessPendingRequests();
