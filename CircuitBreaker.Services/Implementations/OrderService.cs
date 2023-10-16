@@ -26,11 +26,11 @@ namespace CircuitBreaker.Services.Implementations
                 if (_circuitBreaker.CurrentState != CircuitBreakerState.Open)
                 {
                     // Perform the operation that needs circuit breaker protection
-                    //assume this is the payement gateway intefration service.
+                    //that's Dummy API data, assume it's the payement gateway intefration service.
                     var request = new HttpRequestMessage
                     {
                         Method = HttpMethod.Get,
-                        RequestUri = new Uri("https://official-joke-api.appspot.com/random_joke")
+                        RequestUri = new Uri("https://dummy.restapiexample.com/api/v1/employee/1")
                     };
                     HttpClient httpClient = new HttpClient();
                     var response = httpClient.Send(request);
