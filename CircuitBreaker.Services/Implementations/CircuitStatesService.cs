@@ -24,8 +24,9 @@ namespace CircuitBreaker.Services.Implementations
 
             _stateMachine.Configure(CircuitBreakerState.Closed)
                 .OnEntry(() => EnteredClosed())
-                .Permit(CircuitBreakerTrigger.Failure, CircuitBreakerState.Open)
-                .Permit(CircuitBreakerTrigger.Reset, CircuitBreakerState.HalfOpen);
+                .PermitReentry(CircuitBreakerTrigger.Reset)
+                .Permit(CircuitBreakerTrigger.Failure, CircuitBreakerState.Open);
+                //.Permit(CircuitBreakerTrigger.Reset, CircuitBreakerState.HalfOpen);
 
             _stateMachine.Configure(CircuitBreakerState.Open)
                 .OnEntry(() => OpenedEntered())
