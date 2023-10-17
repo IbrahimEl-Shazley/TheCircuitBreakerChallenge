@@ -18,13 +18,13 @@ namespace CircuitBreakerChallenge.Controllers
         }
 
         [HttpGet(Name = "GetData")]
-        public async Task<IActionResult> GetData()
+        public async Task<IActionResult> GetData(bool success)
         {
             try
             {
                 // Perform your protected operation here
                 // For example, make an HTTP request to an external service
-                var result = _Order.ExecuteOperation();
+                var result = _Order.ExecuteOperation(success);
 
                 return Ok(result);
             }

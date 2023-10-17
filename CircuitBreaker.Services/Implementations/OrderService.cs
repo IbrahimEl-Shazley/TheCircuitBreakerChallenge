@@ -19,7 +19,7 @@ namespace CircuitBreaker.Services.Implementations
 
         }
 
-        public string PerformOperation()
+        public string PerformOperation(bool success)
         {
 
             if (_circuitBreaker.CurrentState == CircuitBreakerState.Open)
@@ -28,23 +28,31 @@ namespace CircuitBreaker.Services.Implementations
 
             // Perform the operation that needs circuit breaker protection
             //that's Dummy API data, assume it's the payement gateway integration service.
-            var request = new HttpRequestMessage
+            if (success)
             {
-                Method = HttpMethod.Get,
-                //RequestUri = new Uri("https://dummy.restapiexample.com/api/v1/employee/1")
-                RequestUri = new Uri("https://reqres.in/api/users/2")
+                var request = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Get,
+                    //RequestUri = new Uri("https://dummy.restapiexample.com/api/v1/employee/1")
+                    RequestUri = new Uri("https://reqres.in/api/users/2")
 
-            };
-            HttpClient httpClient = new HttpClient();
-            var response = httpClient.Send(request);
-            response.EnsureSuccessStatusCode();
+                };
+                HttpClient httpClient = new HttpClient();
+                var response = httpClient.Send(request);
+                response.EnsureSuccessStatusCode();
 
-            var responseBody = response.Content.ReadAsStringAsync().Result;
-            return responseBody;
+                var responseBody = response.Content.ReadAsStringAsync().Result;
+                return responseBody;
+            }
+            else
+            {
+                throw new Exception();
+            }
+           
 
         }
 
-        public string ExecuteOperation()
+        public string ExecuteOperation(bool success)
         {
             var circuitBreaker = new CircuitStatesService();
 
@@ -52,7 +60,7 @@ namespace CircuitBreaker.Services.Implementations
             string data = "";
             circuitBreaker.Execute(() =>
             {
-                data = PerformOperation();
+                data = PerformOperation(success);
             });
             return data;
 

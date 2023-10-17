@@ -8,7 +8,7 @@ namespace CircuitBreaker.Services.Interfaces
 {
     public interface IOrderService
     {
-        public string PerformOperation();
-        public string ExecuteOperation();
+        public string PerformOperation(bool success);
+        public string ExecuteOperation(bool success);
     }
 }
